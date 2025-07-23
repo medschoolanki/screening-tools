@@ -98,7 +98,7 @@ def format_symptoms(symptoms):
     else:
         return ", ".join(symptoms[:-1]) + f", and {symptoms[-1]}"
 
-def generate_combined_summary(phq9_score, phq9_symptoms, gad7_score, gad7_symptoms, ybocs_score=None):
+def generate_combined_summary(phq9_score, phq9_symptoms, gad7_score, gad7_symptoms):
     phq9_severity = get_severity(phq9_score, "PHQ9")
     gad7_severity = get_severity(gad7_score, "GAD7")
     
@@ -107,13 +107,16 @@ def generate_combined_summary(phq9_score, phq9_symptoms, gad7_score, gad7_sympto
     
     summary = f"PHQ9: {phq9_score}\n"
     summary += f"GAD7: {gad7_score}\n"
+    summary += f"Patient endorses {phq9_severity} depressive symptoms of {phq9_text} and {gad7_severity} anxious symptoms of {gad7_text}."
     
-    if ybocs_score is not None:
-        ybocs_severity = get_severity(ybocs_score, "YBOCS")
-        summary += f"Y-BOCS: {ybocs_score}\n"
-        summary += f"Patient endorses {phq9_severity} depressive symptoms of {phq9_text}, {gad7_severity} anxious symptoms of {gad7_text}, and {ybocs_severity} obsessive-compulsive symptoms."
-    else:
-        summary += f"Patient endorses {phq9_severity} depressive symptoms of {phq9_text} and {gad7_severity} anxious symptoms of {gad7_text}."
+    return summary
+
+def generate_ybocs_summary(ybocs_score, obsessions_score, compulsions_score):
+    ybocs_severity = get_severity(ybocs_score, "YBOCS")
+    
+    summary = f"Y-BOCS Total: {ybocs_score}\n"
+    summary += f"Obsessions: {obsessions_score}, Compulsions: {compulsions_score}\n"
+    summary += f"Patient endorses {ybocs_severity} obsessive-compulsive symptoms."
     
     return summary
 
@@ -178,6 +181,24 @@ def main():
     total_phq9 = sum(st.session_state.phq9_scores)
     st.write(f"Total PHQ-9 Score: {total_phq9}")
     
+    # Display PHQ-9 and GAD-7 scores and summary
+    st.header("Depression & Anxiety Assessment Results")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("PHQ-9 Score", total_phq9)
+    with col2:
+        st.metric("GAD-7 Score", total_gad7)
+        
+    st.subheader("Clinical Summary")
+    summary = generate_combined_summary(
+        total_phq9,
+        st.session_state.phq9_symptoms,
+        total_gad7,
+        st.session_state.gad7_symptoms
+    )
+    st.text_area("", summary, height=100, key="phq_gad_summary")
+    
     # Y-BOCS Section
     st.header("Y-BOCS Assessment")
     st.write("**Obsessions** are unwanted ideas, images or impulses. **Compulsions** are urges to do repetitive behaviors to lessen anxiety.")
@@ -221,26 +242,14 @@ def main():
     total_ybocs = sum(st.session_state.ybocs_scores)
     st.write(f"**Total Y-BOCS Score: {total_ybocs}**")
     
-    # Display scores and summary
-    st.header("Assessment Results")
+    # Display Y-BOCS results
+    st.header("OCD Assessment Results")
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("PHQ-9 Score", total_phq9)
-    with col2:
-        st.metric("GAD-7 Score", total_gad7)
-    with col3:
-        st.metric("Y-BOCS Score", total_ybocs)
+    st.metric("Y-BOCS Total Score", total_ybocs)
         
-    st.subheader("Clinical Summary")
-    summary = generate_combined_summary(
-        total_phq9,
-        st.session_state.phq9_symptoms,
-        total_gad7,
-        st.session_state.gad7_symptoms,
-        total_ybocs
-    )
-    st.text_area("", summary, height=120)
+    st.subheader("Y-BOCS Clinical Summary")
+    ybocs_summary = generate_ybocs_summary(total_ybocs, obsessions_score, compulsions_score)
+    st.text_area("", ybocs_summary, height=100, key="ybocs_summary")
 
 if __name__ == "__main__":
     main()
