@@ -123,9 +123,13 @@ def main():
     # Initialize session state for storing scores and symptoms
     if 'phq9_scores' not in st.session_state:
         st.session_state.phq9_scores = [0] * len(PHQ9_QUESTIONS)
+    if 'gad7_scores' not in st.session_state:
         st.session_state.gad7_scores = [0] * len(GAD7_QUESTIONS)
+    if 'ybocs_scores' not in st.session_state:
         st.session_state.ybocs_scores = [0] * len(YBOCS_QUESTIONS)
+    if 'phq9_symptoms' not in st.session_state:
         st.session_state.phq9_symptoms = []
+    if 'gad7_symptoms' not in st.session_state:
         st.session_state.gad7_symptoms = []
     
     # GAD-7 Section
