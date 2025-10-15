@@ -2,7 +2,7 @@ import streamlit as st
 
 # PHQ-9 Questions and Symptom Mappings
 PHQ9_QUESTIONS = [
-    ("Little interest or pleasure in doing things that you normall enjoy", "anhedonia"),
+    ("Little interest or pleasure in doing things that you normally enjoy", "anhedonia"),
     ("Feeling down, depressed, or hopeless", "depressed mood"),
     ("Trouble falling or staying asleep, sleeping too much", "difficulty with sleep"),
     ("Feeling tired or having little energy", "fatigue"),
