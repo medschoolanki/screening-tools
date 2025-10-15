@@ -2,7 +2,7 @@ import streamlit as st
 
 # PHQ-9 Questions and Symptom Mappings
 PHQ9_QUESTIONS = [
-    ("Little interest or pleasure in doing things that you normally enjoy", "anhedonia"),
+    ("Little interest or pleasure in doing things that you normall enjoy", "anhedonia"),
     ("Feeling down, depressed, or hopeless", "depressed mood"),
     ("Trouble falling or staying asleep, sleeping too much", "difficulty with sleep"),
     ("Feeling tired or having little energy", "fatigue"),
@@ -271,7 +271,7 @@ def main():
         score = st.radio(
             f"{i+1}. {question_data['question']}",
             options=range(5),
-            format_func=lambda x: question_data['options'][x],
+            format_func=lambda x, opts=question_data['options']: opts[x],
             key=f"ybocs_{i}"
         )
         ybocs_scores.append(score)
@@ -286,7 +286,7 @@ def main():
         score = st.radio(
             f"{i+1}. {question_data['question']}",
             options=range(5),
-            format_func=lambda x: question_data['options'][x],
+            format_func=lambda x, opts=question_data['options']: opts[x],
             key=f"ybocs_{i}"
         )
         ybocs_scores.append(score)
@@ -319,7 +319,7 @@ def main():
         total_gad7,
         gad7_symptoms
     )
-    st.text_area("", summary, height=100, key="phq_gad_summary")
+    st.code(summary, language=None)
     
     # Display Y-BOCS results
     st.header("OCD Assessment Results")
@@ -328,7 +328,7 @@ def main():
         
     st.subheader("Y-BOCS Clinical Summary")
     ybocs_summary = generate_ybocs_summary(total_ybocs, obsessions_score, compulsions_score, ybocs_symptoms)
-    st.text_area("", ybocs_summary, height=100, key="ybocs_summary")
+    st.code(ybocs_summary, language=None)
 
 if __name__ == "__main__":
     main()
