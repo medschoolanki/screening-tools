@@ -215,22 +215,17 @@ def generate_ybocs_summary(ybocs_score, obsessions_score, compulsions_score, ybo
 def main():
     st.title("Mental Health Screening Summary Generator")
     
-    # Initialize session state for storing scores and symptoms
+    # Initialize session state for storing scores
     if 'phq9_scores' not in st.session_state:
         st.session_state.phq9_scores = [0] * len(PHQ9_QUESTIONS)
     if 'gad7_scores' not in st.session_state:
         st.session_state.gad7_scores = [0] * len(GAD7_QUESTIONS)
     if 'ybocs_scores' not in st.session_state:
         st.session_state.ybocs_scores = [0] * len(YBOCS_QUESTIONS)
-    if 'phq9_symptoms' not in st.session_state:
-        st.session_state.phq9_symptoms = []
-    if 'gad7_symptoms' not in st.session_state:
-        st.session_state.gad7_symptoms = []
-    if 'ybocs_symptoms' not in st.session_state:
-        st.session_state.ybocs_symptoms = []
     
     # GAD-7 Section
     st.header("GAD-7 Assessment")
+    gad7_scores = []
     for i, (question, symptom) in enumerate(GAD7_QUESTIONS):
         score = st.radio(
             f"{question}",
@@ -241,19 +236,20 @@ def main():
         
         # Get numeric score (0-3) from the selected option
         score_value = RESPONSE_OPTIONS.index(score)
-        st.session_state.gad7_scores[i] = score_value
-        
-    # Calculate GAD-7 symptoms
-    st.session_state.gad7_symptoms = [
-        symptom for (_, symptom), score in zip(GAD7_QUESTIONS, st.session_state.gad7_scores)
+        gad7_scores.append(score_value)
+    
+    # Calculate GAD-7 symptoms AFTER all radio buttons
+    gad7_symptoms = [
+        symptom for (_, symptom), score in zip(GAD7_QUESTIONS, gad7_scores)
         if score >= 1
     ]
     
-    total_gad7 = sum(st.session_state.gad7_scores)
+    total_gad7 = sum(gad7_scores)
     st.write(f"Total GAD-7 Score: {total_gad7}")
 
     # PHQ-9 Section
     st.header("PHQ-9 Assessment")
+    phq9_scores = []
     for i, (question, symptom) in enumerate(PHQ9_QUESTIONS):
         score = st.radio(
             f"{question}",
@@ -264,15 +260,15 @@ def main():
         
         # Get numeric score (0-3) from the selected option
         score_value = RESPONSE_OPTIONS.index(score)
-        st.session_state.phq9_scores[i] = score_value
-        
-    # Calculate PHQ-9 symptoms
-    st.session_state.phq9_symptoms = [
-        symptom for (_, symptom), score in zip(PHQ9_QUESTIONS, st.session_state.phq9_scores)
+        phq9_scores.append(score_value)
+    
+    # Calculate PHQ-9 symptoms AFTER all radio buttons
+    phq9_symptoms = [
+        symptom for (_, symptom), score in zip(PHQ9_QUESTIONS, phq9_scores)
         if score >= 1
     ]
     
-    total_phq9 = sum(st.session_state.phq9_scores)
+    total_phq9 = sum(phq9_scores)
     st.write(f"Total PHQ-9 Score: {total_phq9}")
     
     # Display PHQ-9 and GAD-7 scores and summary
@@ -287,9 +283,9 @@ def main():
     st.subheader("Clinical Summary")
     summary = generate_combined_summary(
         total_phq9,
-        st.session_state.phq9_symptoms,
+        phq9_symptoms,
         total_gad7,
-        st.session_state.gad7_symptoms
+        gad7_symptoms
     )
     st.text_area("", summary, height=100, key="phq_gad_summary")
     
@@ -299,6 +295,7 @@ def main():
     
     # Obsessions subsection
     st.subheader("Obsessions (Questions 1-5)")
+    ybocs_scores = []
     for i in range(5):
         question_data = YBOCS_QUESTIONS[i]
         score = st.radio(
@@ -309,9 +306,9 @@ def main():
         
         # Get numeric score (0-4) from the selected option
         score_value = question_data['options'].index(score)
-        st.session_state.ybocs_scores[i] = score_value
+        ybocs_scores.append(score_value)
     
-    obsessions_score = sum(st.session_state.ybocs_scores[:5])
+    obsessions_score = sum(ybocs_scores[:5])
     st.write(f"Obsessions Subtotal: {obsessions_score}")
     
     # Compulsions subsection
@@ -326,18 +323,18 @@ def main():
         
         # Get numeric score (0-4) from the selected option
         score_value = question_data['options'].index(score)
-        st.session_state.ybocs_scores[i] = score_value
+        ybocs_scores.append(score_value)
     
-    compulsions_score = sum(st.session_state.ybocs_scores[5:])
+    compulsions_score = sum(ybocs_scores[5:])
     st.write(f"Compulsions Subtotal: {compulsions_score}")
     
-    # Calculate Y-BOCS symptoms
-    st.session_state.ybocs_symptoms = [
-        YBOCS_QUESTIONS[i]['symptom'] for i, score in enumerate(st.session_state.ybocs_scores)
+    # Calculate Y-BOCS symptoms AFTER all radio buttons
+    ybocs_symptoms = [
+        YBOCS_QUESTIONS[i]['symptom'] for i, score in enumerate(ybocs_scores)
         if score >= 1
     ]
     
-    total_ybocs = sum(st.session_state.ybocs_scores)
+    total_ybocs = sum(ybocs_scores)
     st.write(f"**Total Y-BOCS Score: {total_ybocs}**")
     
     # Display Y-BOCS results
@@ -346,7 +343,7 @@ def main():
     st.metric("Y-BOCS Total Score", total_ybocs)
         
     st.subheader("Y-BOCS Clinical Summary")
-    ybocs_summary = generate_ybocs_summary(total_ybocs, obsessions_score, compulsions_score, st.session_state.ybocs_symptoms)
+    ybocs_summary = generate_ybocs_summary(total_ybocs, obsessions_score, compulsions_score, ybocs_symptoms)
     st.text_area("", ybocs_summary, height=100, key="ybocs_summary")
 
 if __name__ == "__main__":
