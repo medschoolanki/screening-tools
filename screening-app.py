@@ -2,7 +2,7 @@ import streamlit as st
 
 # PHQ-9 Questions and Symptom Mappings
 PHQ9_QUESTIONS = [
-    ("Little interest or pleasure in doing things that you normall enjoy", "anhedonia"),
+    ("Little interest or pleasure in doing things that you normally enjoy", "anhedonia"),
     ("Feeling down, depressed, or hopeless", "depressed mood"),
     ("Trouble falling or staying asleep, sleeping too much", "difficulty with sleep"),
     ("Feeling tired or having little energy", "fatigue"),
@@ -215,14 +215,6 @@ def generate_ybocs_summary(ybocs_score, obsessions_score, compulsions_score, ybo
 def main():
     st.title("Mental Health Screening Summary Generator")
     
-    # Initialize session state for storing scores
-    if 'phq9_scores' not in st.session_state:
-        st.session_state.phq9_scores = [0] * len(PHQ9_QUESTIONS)
-    if 'gad7_scores' not in st.session_state:
-        st.session_state.gad7_scores = [0] * len(GAD7_QUESTIONS)
-    if 'ybocs_scores' not in st.session_state:
-        st.session_state.ybocs_scores = [0] * len(YBOCS_QUESTIONS)
-    
     # GAD-7 Section
     st.header("GAD-7 Assessment")
     gad7_scores = []
@@ -238,7 +230,7 @@ def main():
         score_value = RESPONSE_OPTIONS.index(score)
         gad7_scores.append(score_value)
     
-    # Calculate GAD-7 symptoms AFTER all radio buttons
+    # Calculate GAD-7 symptoms
     gad7_symptoms = [
         symptom for (_, symptom), score in zip(GAD7_QUESTIONS, gad7_scores)
         if score >= 1
@@ -262,7 +254,7 @@ def main():
         score_value = RESPONSE_OPTIONS.index(score)
         phq9_scores.append(score_value)
     
-    # Calculate PHQ-9 symptoms AFTER all radio buttons
+    # Calculate PHQ-9 symptoms
     phq9_symptoms = [
         symptom for (_, symptom), score in zip(PHQ9_QUESTIONS, phq9_scores)
         if score >= 1
@@ -270,24 +262,6 @@ def main():
     
     total_phq9 = sum(phq9_scores)
     st.write(f"Total PHQ-9 Score: {total_phq9}")
-    
-    # Display PHQ-9 and GAD-7 scores and summary
-    st.header("Depression & Anxiety Assessment Results")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("PHQ-9 Score", total_phq9)
-    with col2:
-        st.metric("GAD-7 Score", total_gad7)
-        
-    st.subheader("Clinical Summary")
-    summary = generate_combined_summary(
-        total_phq9,
-        phq9_symptoms,
-        total_gad7,
-        gad7_symptoms
-    )
-    st.text_area("", summary, height=100, key="phq_gad_summary")
     
     # Y-BOCS Section
     st.header("Y-BOCS Assessment")
@@ -328,7 +302,7 @@ def main():
     compulsions_score = sum(ybocs_scores[5:])
     st.write(f"Compulsions Subtotal: {compulsions_score}")
     
-    # Calculate Y-BOCS symptoms AFTER all radio buttons
+    # Calculate Y-BOCS symptoms
     ybocs_symptoms = [
         YBOCS_QUESTIONS[i]['symptom'] for i, score in enumerate(ybocs_scores)
         if score >= 1
@@ -336,6 +310,24 @@ def main():
     
     total_ybocs = sum(ybocs_scores)
     st.write(f"**Total Y-BOCS Score: {total_ybocs}**")
+    
+    # NOW display all results at the end after everything is collected
+    st.header("Depression & Anxiety Assessment Results")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("PHQ-9 Score", total_phq9)
+    with col2:
+        st.metric("GAD-7 Score", total_gad7)
+        
+    st.subheader("Clinical Summary")
+    summary = generate_combined_summary(
+        total_phq9,
+        phq9_symptoms,
+        total_gad7,
+        gad7_symptoms
+    )
+    st.text_area("", summary, height=100, key="phq_gad_summary")
     
     # Display Y-BOCS results
     st.header("OCD Assessment Results")
