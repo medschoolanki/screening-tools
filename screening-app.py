@@ -258,7 +258,23 @@ def main():
     
     total_phq9 = sum(phq9_scores)
     st.write(f"Total PHQ-9 Score: {total_phq9}")
+    # NOW display all results at the end after everything is collected
+    st.header("Depression & Anxiety Assessment Results")
     
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("PHQ-9 Score", total_phq9)
+    with col2:
+        st.metric("GAD-7 Score", total_gad7)
+        
+    st.subheader("Clinical Summary")
+    summary = generate_combined_summary(
+        total_phq9,
+        phq9_symptoms,
+        total_gad7,
+        gad7_symptoms
+    )
+    st.code(summary, language=None)
     # Y-BOCS Section
     st.header("Y-BOCS Assessment")
     st.write("**Obsessions** are unwanted ideas, images or impulses. **Compulsions** are urges to do repetitive behaviors to lessen anxiety.")
@@ -303,23 +319,7 @@ def main():
     total_ybocs = sum(ybocs_scores)
     st.write(f"**Total Y-BOCS Score: {total_ybocs}**")
     
-    # NOW display all results at the end after everything is collected
-    st.header("Depression & Anxiety Assessment Results")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("PHQ-9 Score", total_phq9)
-    with col2:
-        st.metric("GAD-7 Score", total_gad7)
-        
-    st.subheader("Clinical Summary")
-    summary = generate_combined_summary(
-        total_phq9,
-        phq9_symptoms,
-        total_gad7,
-        gad7_symptoms
-    )
-    st.code(summary, language=None)
+  
     
     # Display Y-BOCS results
     st.header("OCD Assessment Results")
