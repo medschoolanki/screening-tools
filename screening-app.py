@@ -2,7 +2,7 @@ import streamlit as st
 
 # PHQ-9 Questions and Symptom Mappings
 PHQ9_QUESTIONS = [
-    ("Little interest or pleasure in doing things that you normally enjoy", "anhedonia"),
+    ("Little interest or pleasure in doing things that you normal enjoy", "anhedonia"),
     ("Feeling down, depressed, or hopeless", "depressed mood"),
     ("Trouble falling or staying asleep, sleeping too much", "difficulty with sleep"),
     ("Feeling tired or having little energy", "fatigue"),
@@ -219,15 +219,21 @@ def main():
     st.header("GAD-7 Assessment")
     gad7_scores = []
     for i, (question, symptom) in enumerate(GAD7_QUESTIONS):
+        # Use session state to track the actual value
+        if f"gad7_{i}" not in st.session_state:
+            st.session_state[f"gad7_{i}"] = 0
+            
         score = st.radio(
             f"{question}",
             options=RESPONSE_OPTIONS,
-            key=f"gad7_{i}",
+            index=st.session_state[f"gad7_{i}"],
+            key=f"gad7_radio_{i}",
             horizontal=True
         )
         
         # Get numeric score (0-3) from the selected option
         score_value = RESPONSE_OPTIONS.index(score)
+        st.session_state[f"gad7_{i}"] = score_value
         gad7_scores.append(score_value)
     
     # Calculate GAD-7 symptoms
@@ -243,15 +249,21 @@ def main():
     st.header("PHQ-9 Assessment")
     phq9_scores = []
     for i, (question, symptom) in enumerate(PHQ9_QUESTIONS):
+        # Use session state to track the actual value
+        if f"phq9_{i}" not in st.session_state:
+            st.session_state[f"phq9_{i}"] = 0
+            
         score = st.radio(
             f"{question}",
             options=RESPONSE_OPTIONS,
-            key=f"phq9_{i}",
+            index=st.session_state[f"phq9_{i}"],
+            key=f"phq9_radio_{i}",
             horizontal=True
         )
         
         # Get numeric score (0-3) from the selected option
         score_value = RESPONSE_OPTIONS.index(score)
+        st.session_state[f"phq9_{i}"] = score_value
         phq9_scores.append(score_value)
     
     # Calculate PHQ-9 symptoms
@@ -272,14 +284,21 @@ def main():
     ybocs_scores = []
     for i in range(5):
         question_data = YBOCS_QUESTIONS[i]
+        
+        # Use session state to track the actual value
+        if f"ybocs_{i}" not in st.session_state:
+            st.session_state[f"ybocs_{i}"] = 0
+            
         score = st.radio(
             f"{i+1}. {question_data['question']}",
             options=question_data['options'],
-            key=f"ybocs_{i}"
+            index=st.session_state[f"ybocs_{i}"],
+            key=f"ybocs_radio_{i}"
         )
         
         # Get numeric score (0-4) from the selected option
         score_value = question_data['options'].index(score)
+        st.session_state[f"ybocs_{i}"] = score_value
         ybocs_scores.append(score_value)
     
     obsessions_score = sum(ybocs_scores[:5])
@@ -289,14 +308,21 @@ def main():
     st.subheader("Compulsions (Questions 6-10)")
     for i in range(5, 10):
         question_data = YBOCS_QUESTIONS[i]
+        
+        # Use session state to track the actual value
+        if f"ybocs_{i}" not in st.session_state:
+            st.session_state[f"ybocs_{i}"] = 0
+            
         score = st.radio(
             f"{i+1}. {question_data['question']}",
             options=question_data['options'],
-            key=f"ybocs_{i}"
+            index=st.session_state[f"ybocs_{i}"],
+            key=f"ybocs_radio_{i}"
         )
         
         # Get numeric score (0-4) from the selected option
         score_value = question_data['options'].index(score)
+        st.session_state[f"ybocs_{i}"] = score_value
         ybocs_scores.append(score_value)
     
     compulsions_score = sum(ybocs_scores[5:])
